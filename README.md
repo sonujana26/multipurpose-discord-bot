@@ -1,6 +1,6 @@
 ﻿# Public Bot and Support Server!
 
-<a href="https://discord.gg/F5RWsAWVkp"><img src="https://discord.com/api/guilds/773668217163218944/widget.png?style=banner2"></a>
+<a href="https://discord.gg/F5RWsAWVkp"><img src="https://discord.com/api/guilds/951122149664514099/widget.png?style=banner2"></a>
  
 [**Invite the Public Version of this Bot**](https://discord.com/api/oauth2/authorize?client_id=1097842300526284880&permissions=8&scope=bot) so you don't need to host it by yourself or [Join Olympus](https://discord.gg/F5RWsAWVkp) and Dm `sonujana#0` to get a custom Bot for you!
 
