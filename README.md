@@ -182,7 +182,7 @@ This is a list of some of the commands that you can use with the Multipurpose Di
 </details>
 
 
-## SUPPORT me AND MILRATO DEVELOPMENT
+## SUPPORT
 
 > You can always Support me by [Joining Our Community](https://discord.com/invite/F5RWsAWVkp)
 
