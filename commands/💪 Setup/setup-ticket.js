@@ -1,0 +1,898 @@
+var {
+  MessageEmbed
+} = require(`discord.js`);
+var Discord = require(`discord.js`);
+var config = require(`${process.cwd()}/botconfig/config.json`);
+var ee = require(`${process.cwd()}/botconfig/embed.json`);
+var emoji = require(`${process.cwd()}/botconfig/emojis.json`);
+var {
+  databasing
+} = require(`${process.cwd()}/handlers/functions`);
+const {
+  MessageButton,
+  MessageActionRow,
+  MessageSelectMenu
+} = require('discord.js')
+module.exports = {
+  name: "setup-ticket",
+  category: "💪 Setup",
+  aliases: ["setupticket", "ticket-setup", "ticketsetup", "ticketsystem", "ticketcreate", "ticket-create"],
+  cooldown: 5,
+  usage: "setup-ticket --> Follow Steps",
+  description: "Manage 25 different Ticket Systems, Ticket-Roles, messages, create/disable",
+  memberpermissions: ["ADMINISTRATOR"],
+  type: "system",
+  run: async (client, message, args, cmduser, text, prefix) => {
+
+    let es = client.settings.get(message.guild.id, "embed");
+    let ls = client.settings.get(message.guild.id, "language")
+    try {
+      let temptype = 0;
+      let errored = false;
+      let guildid = message.guild.id;
+      let NumberEmojiIds = getNumberEmojis().map(emoji => emoji?.replace(">", "").split(":")[2])
+      first_layer()
+      async function first_layer() {
+
+        let menuoptions = []
+        for (let i = 1; i <= 100; i++) {
+          menuoptions.push({
+            value: `${i} Ticket System`,
+            description: `Manage/Edit the ${i} Ticket Setup`,
+            emoji: NumberEmojiIds[i]
+          })
+        }
+        
+        let row1 = new MessageActionRow().addComponents(new MessageSelectMenu()
+          .setCustomId('MenuSelection')
+          .setMaxValues(1) //OPTIONAL, this is how many values you can have at each selection
+          .setMinValues(1) //OPTIONAL , this is how many values you need to have at each selection
+          .setPlaceholder('Click me to setup the Ticket System!')
+          .addOptions(
+            menuoptions.slice(0, 25).map(option => {
+              let Obj = {
+                label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                value: option.value.substring(0, 50),
+                description: option.description.substring(0, 50),
+              }
+              if (option.emoji) Obj.emoji = option.emoji;
+              return Obj;
+            })
+          )
+        )
+        let row2 = new MessageActionRow().addComponents(new MessageSelectMenu()
+          .setCustomId('MenuSelection2')
+          .setMaxValues(1) //OPTIONAL, this is how many values you can have at each selection
+          .setMinValues(1) //OPTIONAL , this is how many values you need to have at each selection
+          .setPlaceholder('Click me to setup the Ticket System!')
+          .addOptions(
+            menuoptions.slice(25, 50).map(option => {
+              let Obj = {
+                label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                value: option.value.substring(0, 50),
+                description: option.description.substring(0, 50),
+              }
+              if (option.emoji) Obj.emoji = option.emoji;
+              return Obj;
+            })
+          )
+        )
+        let row3 = new MessageActionRow().addComponents(new MessageSelectMenu()
+          .setCustomId('MenuSelection3')
+          .setMaxValues(1) //OPTIONAL, this is how many values you can have at each selection
+          .setMinValues(1) //OPTIONAL , this is how many values you need to have at each selection
+          .setPlaceholder('Click me to setup the Ticket System!')
+          .addOptions(
+            menuoptions.slice(50, 75).map(option => {
+              let Obj = {
+                label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                value: option.value.substring(0, 50),
+                description: option.description.substring(0, 50),
+              }
+              if (option.emoji) Obj.emoji = option.emoji;
+              return Obj;
+            })
+          )
+        )
+        let row4 = new MessageActionRow().addComponents(new MessageSelectMenu()
+          .setCustomId('MenuSelection4')
+          .setMaxValues(1) //OPTIONAL, this is how many values you can have at each selection
+          .setMinValues(1) //OPTIONAL , this is how many values you need to have at each selection
+          .setPlaceholder('Click me to setup the Ticket System!')
+          .addOptions(
+            menuoptions.slice(75, 100).map(option => {
+              let Obj = {
+                label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                value: option.value.substring(0, 50),
+                description: option.description.substring(0, 50),
+              }
+              if (option.emoji) Obj.emoji = option.emoji;
+              return Obj;
+            })
+          )
+        )
+        
+
+        //define the embed
+        let MenuEmbed = new Discord.MessageEmbed()
+          .setColor(es.color)
+          .setAuthor(client.getAuthor('Ticket Setup', 'https://cdn3.emoji.gg/emojis/7733-ticket-badge.png'))
+          .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable2"]))
+        let used1 = false;
+        //send the menu msg
+        let menumsg = await message.reply({
+          embeds: [MenuEmbed],
+          components: [row1, row2, row3, row4]
+        })
+        //function to handle the menuselection
+        function menuselection(menu) {
+          let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+          if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable3"]))
+          menu?.deferUpdate();
+          let SetupNumber = menu?.values[0].split(" ")[0]
+          used1 = true;
+          second_layer(SetupNumber, menuoptiondata)
+        }
+        //Create the collector
+        const collector = menumsg.createMessageComponentCollector({
+          filter: i => i?.isSelectMenu() && i?.message.author.id == client.user.id && i?.user,
+          time: 90000
+        })
+        //Menu Collections
+        collector.on('collect', menu => {
+          if (menu?.user.id === cmduser.id) {
+            collector.stop();
+            let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+            if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable3"]))
+            menuselection(menu)
+          } else menu?.reply({
+            content: `<:cx_cross:1198077504599117834> You are not allowed to do that! Only: <@${cmduser.id}>`,
+            ephemeral: true
+          });
+        });
+        //Once the Collections ended edit the menu message
+        collector.on('end', collected => {
+          menumsg.edit({
+            embeds: [menumsg.embeds[0].setDescription(`~~${menumsg.embeds[0].description}~~`)],
+            components: [],
+            content: `${collected && collected.first() && collected.first().values ? `<:cx_tick:1198077126939779102> **Selected: \`${collected ? collected.first().values[0] : "Nothing"}\`**` : "<:cx_cross:1198077504599117834> **NOTHING SELECTED - CANCELLED**"}`
+          })
+        });
+      }
+      async function second_layer(SetupNumber, menuoptiondata) {
+         
+          let menuoptions = [{
+          value: "Create Ticket-System",
+          description: `Create/Overwrite the ${SetupNumber} Ticket System`,
+          emoji: "1206064015026028555"
+        },
+        {
+          value: "Edit Message",
+          description: `Edit the Message when a Ticket opens`,
+          emoji: "1205377018863292416"
+        },
+        {
+          value: "Add Ticket Role",
+          description: `Add a Ticket Role for managing the Tickets`,
+          emoji: "1206064665873088523"
+        },
+        {
+          value: "Remove Ticket Role",
+          description: `Remove a Ticket Role from managing the Tickets`,
+          emoji: "1206064988133793812"
+        },
+        {
+          value: "Ticket Category",
+          description: `Define the Category where the Tickets are located`,
+          emoji: "1206065176986779688"
+        },
+        {
+          value: "Ticket Claim System",
+          description: `Manage the Claim System for this Ticket System.`,
+          emoji: "1206065356381364287"
+        },
+        {
+          value: "Log Channel",
+          description: `Define a Channel for Ticket Logs!`,
+          emoji: "1205382553092104242"
+        },
+        {
+          value: "Set Default Ticket Name",
+          description: `Define a Default Ticket Channel Name!`,
+          emoji: "1206065628306473010"
+        },
+        {
+          value: "Delete & Reset",
+          description: `Delete current setup, which allows you to resetup`,
+          emoji: "1198208227746259095"
+        },
+        {
+          value: "Closed Ticket Category",
+          description: `When Closing a Ticket, it will be moved to there`,
+          emoji: "1206066136425168926"
+        },
+        {
+          value: "Cancel",
+          description: `Cancel and stop the Ticket-Setup!`,
+          emoji: "1204106928675102770"
+        }
+        ]
+        //define the selection
+        let Selection = new MessageSelectMenu()
+          .setCustomId('MenuSelection')
+          .setMaxValues(1)
+          .setMinValues(1)
+          .setPlaceholder(`Click me to manage the ${SetupNumber} Ticket System!\n\n**You've picked:**\n> ${menuoptiondata.value}`)
+          .addOptions(
+            menuoptions.map(option => {
+              let Obj = {
+                label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                value: option.value.substring(0, 50),
+                description: option.description.substring(0, 50),
+              }
+              if (option.emoji) Obj.emoji = option.emoji;
+              return Obj;
+            }))
+
+        //define the embed
+        let MenuEmbed = new Discord.MessageEmbed()
+          .setColor(es.color)
+          .setAuthor(SetupNumber + " Ticket Setup", "https://cdn3.emoji.gg/emojis/7733-ticket-badge.png")
+          .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable4"]))
+        //send the menu msg
+        let menumsg = await message.reply({
+          embeds: [MenuEmbed],
+          components: [new MessageActionRow().addComponents(Selection)]
+        })
+        //function to handle the menuselection
+        function menuselection(menu) {
+          let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+          if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable5"]))
+          menu?.deferUpdate();
+          var ticket = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}`);
+          handle_the_picks(menu?.values[0], SetupNumber, ticket)
+        }
+        //Create the collector
+        const collector = menumsg.createMessageComponentCollector({
+          filter: i => i?.isSelectMenu() && i?.message.author.id == client.user.id && i?.user,
+          time: 90000
+        })
+        //Menu Collections
+        collector.on('collect', menu => {
+          if (menu?.user.id === cmduser.id) {
+            collector.stop();
+            let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+            if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable3"]))
+            menuselection(menu)
+          } else menu?.reply({
+            content: `<:cx_cross:1198077504599117834> You are not allowed to do that! Only: <@${cmduser.id}>`,
+            ephemeral: true
+          });
+        });
+        //Once the Collections ended edit the menu message
+        collector.on('end', collected => {
+          menumsg.edit({
+            embeds: [menumsg.embeds[0].setDescription(`~~${menumsg.embeds[0].description}~~`)],
+            components: [],
+            content: `${collected && collected.first() && collected.first().values ? `<:cx_tick:1198077126939779102> **Selected: \`${collected ? collected.first().values[0] : "Nothing"}\`**` : "<:cx_cross:1198077504599117834> **NOTHING SELECTED - CANCELLED**"}`
+          })
+        });
+      }
+
+      async function handle_the_picks(optionhandletype, SetupNumber, ticket) {
+
+        switch (optionhandletype) {
+          case "Closed Ticket Category": {
+            let parentId = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}.closedParent`);
+            let parent = parentId ? message.guild.channels.cache.get(parentId) : null;
+            var rembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter(es))
+              .setTitle("What should be the new Closed Ticket Category?")
+              .setDescription(`Currently it's: \`${parentId ? "Not Setupped yet" : parent ? parent.name : `Channel not Found: ${parentId}`}\`!\nWhen closing a Ticket, it will be moved to there until it get's deleted!\n> **Send the new __PARENT ID__ now!**`)
+            message.reply({
+              embeds: [rembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                let content = collected.first().content;
+                if (!content || content.length > 19 || content.length < 17) {
+                  return message.reply("An Id is between 17 and 19 characters big")
+                }
+                parent = message.guild.channels.cache.get(content);
+                if(!parent) {
+                  return message.reply(`There is no parent i can access in this Guild which has the ID ${content}`);
+                }
+                if(parent.type !== "GUILD_CATEGORY"){
+                  return message.reply(`<#${parent.id}> is not a CATEGORY/PARENT`);
+                }
+                client.setups.set(message.guild.id, parent.id, `ticketsystem${SetupNumber}.closedParent`);
+                message.reply(`I will now move closed Tickets to ${parent.name} (${parent.id})`);
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable21"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+          } break;
+          case "Set Default Ticket Name": {
+            let defaultname = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}.defaultname`);
+            var rembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter(es))
+              .setTitle("What should be the new Default Ticket Name?")
+              .setDescription(`Currently it's: \`${defaultname}\` aka it will turn into: \`${defaultname.replace("{member}", message.author.username).replace("{count}", 0)}\`\n> \`{member}\` ... will get replaced with the ticket opening username\n> \`{count}\` ... Will get replaced with the TICKET ID (COUNT)\n**Send the Message now!**`)
+            message.reply({
+              embeds: [rembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                let content = collected.first().content;
+                if (!content || !content.includes("{member}")) {
+                  return message.reply("You need to have {member} somewhere")
+                }
+                if (!content || content.length > 32) {
+                  return message.reply("A Channelname can't be longer then 32 Characters")
+                }
+                defaultname = content;
+                client.setups.set(message.guild.id, defaultname, `ticketsystem${SetupNumber}.defaultname`);
+                message.reply(`Set the Default Ticket Name to: \`${defaultname}\` aka it will turn into: \`${defaultname.replace("{member}", message.author.username).replace("{count}", 0)}\``)
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable21"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+          } break;
+          case "Create Ticket-System":
+
+            var msg11 = new MessageEmbed()
+              .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable6"]))
+              .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable7"]))
+              .setFooter(client.getFooter(es))
+              .setColor(es.color)
+            message.reply({
+              embeds: [msg11]
+            }).then(mm => {
+              mm.channel.awaitMessages({
+                filter: (m) => m.author.id == cmduser,
+                max: 1,
+                time: 180000,
+                errors: ['time'],
+              }).then(collected => {
+                let channel = collected.first().mentions.channels?.filter(ch => ch.guild.id == mm.guild.id)?.first()
+                if (!channel) return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable8"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+                var msg6 = new MessageEmbed()
+                  .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable9"]))
+                  .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable10"]))
+                  .setFooter(client.getFooter(es))
+                  .setColor(es.color)
+                message.reply({
+                  embeds: [msg6]
+                }).then(msg => {
+                  msg.channel.awaitMessages({
+                    filter: m => m.author.id == cmduser,
+                    max: 1,
+                    time: 180000,
+                    errors: ['time'],
+                  }).then(collected => {
+                    //parent id in db
+                    if (channel.parent && channel.parent.id) client.setups.set(message.guild.id, channel.parent.id, `ticketsystem${SetupNumber}.parentid`);
+
+                    ticketmsg = collected.first().content;
+
+                    //channel id in db
+                    client.setups.set(message.guild.id, channel.id, `ticketsystem${SetupNumber}.channelid`);
+
+                    let button_open = new MessageActionRow().addComponents([new MessageButton().setStyle('SUCCESS').setCustomId('create_a_ticket').setLabel('Create a Ticket').setEmoji("📨")])
+
+                    channel.send({
+                      embeds: [new MessageEmbed()
+                        .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable11"]))
+                        .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable12"]))
+                        .setFooter(client.getFooter(es))
+                        .setColor(es.color)
+                      ],
+                      components: [button_open]
+                    }).then(msg => {
+                      //message id in db
+                      client.setups.set(message.guild.id, msg.id, `ticketsystem${SetupNumber}.messageid`);
+                      client.setups.set(message.guild.id, true, `ticketsystem${SetupNumber}.enabled`);
+                      //msg.react(emoji2react)
+                      var themebd = new MessageEmbed()
+                        .setColor(es.color)
+                        .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable13"]))
+                        .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable14"]))
+                        .setFooter(client.getFooter(es))
+
+                      message.reply({
+                        embeds: [themebd]
+                      })
+
+                    })
+                  }).catch(error => {
+                    return message.reply({
+                      embeds: [new Discord.MessageEmbed()
+                        .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable15"]))
+                        .setColor(es.wrongcolor)
+                        .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                        .setFooter(client.getFooter(es))
+                      ]
+                    });
+                  })
+                })
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable16"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+
+
+
+
+            break;
+          case "Delete & Reset":
+            try {
+              var channel = message.guild.channels.cache.get(ticket.channelid)
+              channel.delete();
+            } catch { }
+            try {
+              var parent = message.guild.channels.cache.get(ticket.parentid)
+              parent.delete();
+            } catch { }
+            message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable17"]))
+            client.setups.set(message.guild.id, {
+              enabled: true,
+              guildid: message.guild.id,
+              messageid: "",
+              channelid: "",
+              parentid: "",
+              claim: {
+                enabled: false,
+                messageOpen: "Dear {user}!\n> *Please wait until a Staff Member, claimed your Ticket!*",
+                messageClaim: "{claimer} **has claimed the Ticket!**\n> He will now give {user} support!"
+              },
+              message: "Hey {user}, thanks for opening an ticket! Someone will help you soon!",
+              adminroles: []
+            }, `ticketsystem${SetupNumber}`);
+            break;
+          case "Edit Message":
+            var rembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter(es))
+
+              .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable18"]))
+              .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable19"]))
+            message.reply({
+              embeds: [rembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable20"]))
+                client.setups.set(message.guild.id, collected.first().content, `ticketsystem${SetupNumber}.message`);
+
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable21"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+            break;
+          case "Add Ticket Role":
+            var rrembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter("Pick the INDEX NUMBER", es.footericon))
+
+              .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable22"]))
+              .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable23"]))
+            message.reply({
+              embeds: [rrembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                var role = collected.first().mentions.roles.filter(role => role.guild.id == message.guild.id).first();
+                if (!role) message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable24"]))
+
+                message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable25"]));
+                client.setups.push(message.guild.id, role.id, `ticketsystem${SetupNumber}.adminroles`);
+
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable26"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+            break;
+          case "Remove Ticket Role":
+            var rrrembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter("Pick the INDEX NUMBER", es.footericon))
+
+              .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable27"]))
+              .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable28"]))
+            message.reply({
+              embeds: [rrrembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                var role = collected.first().mentions.roles.filter(role => role.guild.id == message.guild.id).first();
+                if (!role) message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable29"]))
+                try {
+                  client.setups.remove(message.guild.id, role.id, `ticketsystem${SetupNumber}.adminroles`);
+                  message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable30"]));
+                } catch {
+                  message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable31"]))
+                  client.setups.set(message.guild.id, [], `ticketsystem${SetupNumber}.adminroles`);
+                }
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable32"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+            break;
+          case "Ticket Category":
+            var rembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter(es))
+
+              .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable33"]))
+              .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable34"]))
+            message.reply({
+              embeds: [rembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                if (collected.first().content.length == 18) {
+                  try {
+                    var cat = message.guild.channels.cache.get(collected.first().content)
+                    message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable35"]))
+                    client.setups.set(message.guild.id, cat.id, `ticketsystem${SetupNumber}.parentid`);
+                  } catch {
+                    message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable36"]))
+                  }
+                } else {
+                  message.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable37"]))
+                }
+
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable38"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+            break;
+          case "Ticket Claim System": {
+            /*
+            claim: {
+              enabled: false,
+              messageOpen: "Dear {user}!\n> *Please wait until a Staff Member, claimed your Ticket!*",
+              messageClaim: "{claimer} **has claimed the Ticket!**\n> He will now give {user} support!"
+            },
+            */
+            let claimData = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}.claim`);
+            third_layer(SetupNumber)
+            async function third_layer(SetupNumber) {
+              let menuoptions = [{
+                value: `${claimData.enabled ? "Disable Claim System" : "Enable Claim System"}`,
+                description: `${claimData.enabled ? "No need to claim the Tickets anymore" : "Make it so that Staff needs to claim the Ticket"}`,
+                emoji: `${claimData.enabled ? "1204107662392827904" : "1204107832232775730"}`
+              },
+              {
+                value: "Edit Open Message",
+                description: `Edit the Claim-Info-Message when a Ticket opens`,
+                emoji: "1205377018863292416"
+              },
+              {
+                value: "Edit Claim Message",
+                description: `Edit the Claim-Message when a Staff claims it!`,
+                emoji: "1205377018863292416"
+              },
+              {
+                value: "Cancel",
+                description: `Cancel and stop the Ticket-Setup!`,
+                emoji: "1204106928675102770"
+              }
+              ]
+              //define the selection
+              let Selection = new MessageSelectMenu()
+                .setCustomId('MenuSelection')
+                .setMaxValues(1)
+                .setMinValues(1)
+                .setPlaceholder(`Click me to manage the ${SetupNumber} Ticket System!\n\n**You've picked:**\n> Ticket Claim System`)
+                .addOptions(
+                  menuoptions.map(option => {
+                    let Obj = {
+                      label: option.label ? option.label.substring(0, 50) : option.value.substring(0, 50),
+                      value: option.value.substring(0, 50),
+                      description: option.description.substring(0, 50),
+                    }
+                    if (option.emoji) Obj.emoji = option.emoji;
+                    return Obj;
+                  }))
+
+              //define the embed
+              let MenuEmbed = new Discord.MessageEmbed()
+                .setColor(es.color)
+                .setAuthor(SetupNumber + " Ticket Setup", "https://cdn3.emoji.gg/emojis/7733-ticket-badge.png")
+                .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable4"]))
+              //send the menu msg
+              let menumsg = await message.reply({
+                embeds: [MenuEmbed],
+                components: [new MessageActionRow().addComponents(Selection)]
+              })
+              //function to handle the menuselection
+              function menuselection(menu) {
+                let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+                if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable5"]))
+                menu?.deferUpdate();
+                var ticket = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}`);
+                handle_the_picks2(menu?.values[0], SetupNumber, ticket)
+              }
+              //Create the collector
+              const collector = menumsg.createMessageComponentCollector({
+                filter: i => i?.isSelectMenu() && i?.message.author.id == client.user.id && i?.user,
+                time: 90000
+              })
+              //Menu Collections
+              collector.on('collect', menu => {
+                if (menu?.user.id === cmduser.id) {
+                  collector.stop();
+                  let menuoptiondata = menuoptions.find(v => v.value == menu?.values[0])
+                  if (menu?.values[0] == "Cancel") return menu?.reply(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable3"]))
+                  menuselection(menu)
+                } else menu?.reply({
+                  content: `<:cx_cross:1198077504599117834> You are not allowed to do that! Only: <@${cmduser.id}>`,
+                  ephemeral: true
+                });
+              });
+              //Once the Collections ended edit the menu message
+              collector.on('end', collected => {
+                menumsg.edit({
+                  embeds: [menumsg.embeds[0].setDescription(`~~${menumsg.embeds[0].description}~~`)],
+                  components: [],
+                  content: `${collected && collected.first() && collected.first().values ? `<:cx_tick:1198077126939779102> **Selected: \`${collected ? collected.first().values[0] : "Nothing"}\`**` : "<:cx_cross:1198077504599117834> **NOTHING SELECTED - CANCELLED**"}`
+                })
+              });
+            }
+            async function handle_the_picks2(optionhandletype, SetupNumber) {
+
+              switch (optionhandletype) {
+                case `${claimData.enabled ? "Disable Claim System" : "Enable Claim System"}`: {
+                  client.setups.set(message.guild.id, !claimData.enabled, `ticketsystem${SetupNumber}.claim.enabled`);
+                  claimData = client.setups.get(message.guild.id, `ticketsystem${SetupNumber}.claim`);
+                  return message.reply({
+                    embeds: [
+                      new MessageEmbed().setColor(es.color).setThumbnail(es.thumb ? es.footericon && (es.footericon.includes("http://") || es.footericon.includes("https://")) ? es.footericon : client.user.displayAvatarURL() : null)
+                        .setFooter(client.getFooter(es))
+                        .setTitle(`${claimData.enabled ? "Enabled the Claim System" : "Disabled the Claim System"}`)
+                        .setDescription(`${claimData.enabled ? "When a User opens a Ticket, a Staff Member needs to claim it, before he can send something in there!\n> This is useful for Professionality and Information!\n> **NOTE:** Admins can always chat..." : "You now don't need to claim a Ticket anymore"}`)
+                    ]
+                  });
+                } break;
+                case "Edit Open Message": {
+                  var rembed = new MessageEmbed()
+                    .setColor(es.color)
+                    .setFooter(client.getFooter(es))
+                    .setTitle("What should be the new Message when a User opens a Ticket?")
+                    .setDescription(String("{user} will be replaced with a USERPING\n\n**Current Message:**\n>>> " + claimData.messageOpen.substring(0, 1900)))
+                  message.reply({
+                    embeds: [rembed]
+                  }).then(msg => {
+                    msg.channel.awaitMessages({
+                      filter: m => m.author.id === message.author.id,
+                      max: 1,
+                      time: 30000,
+                      errors: ['time']
+                    }).then(collected => {
+                      client.setups.set(message.guild.id, collected.first().content, `ticketsystem${SetupNumber}.claim.messageOpen`);
+                      message.reply(`Successfully set the New Message!`)
+                    }).catch(error => {
+                      return message.reply({
+                        embeds: [new Discord.MessageEmbed()
+                          .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable21"]))
+                          .setColor(es.wrongcolor)
+                          .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                          .setFooter(client.getFooter(es))
+                        ]
+                      });
+                    })
+                  })
+                } break;
+                case "Edit Claim Message": {
+                  var rembed = new MessageEmbed()
+                    .setColor(es.color)
+                    .setFooter(client.getFooter(es))
+                    .setTitle("What should be the new Message when a Staff claims a Ticket?")
+                    .setDescription(String("{user} will be replaced with a USERPING\n{claimer} will be replaced with a PING for WHO CLAIMED IT\n\n**Current Message:**\n>>> " + claimData.messageClaim.substring(0, 1900)))
+                  message.reply({
+                    embeds: [rembed]
+                  }).then(msg => {
+                    msg.channel.awaitMessages({
+                      filter: m => m.author.id === message.author.id,
+                      max: 1,
+                      time: 30000,
+                      errors: ['time']
+                    }).then(collected => {
+                      client.setups.set(message.guild.id, collected.first().content, `ticketsystem${SetupNumber}.claim.messageClaim`);
+                      message.reply(`Successfully set the New Message!`)
+                    }).catch(error => {
+                      return message.reply({
+                        embeds: [new Discord.MessageEmbed()
+                          .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable21"]))
+                          .setColor(es.wrongcolor)
+                          .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                          .setFooter(client.getFooter(es))
+                        ]
+                      });
+                    })
+                  })
+                } break;
+              }
+            }
+          } break;
+          case "Log Channel":
+            //ticketlogid
+            var rembed = new MessageEmbed()
+              .setColor(es.color)
+              .setFooter(client.getFooter(es))
+              .setTitle("In What Channel do you want to send Logs of this Ticket-System (When a Ticket gets DELETED)")
+              .setDescription(`Ping the Channel / send \`no\` for disabeling Logs!\n\n*The Log will only be sent if the ticket gets __DELETED__ via the BUTTON (not the closing)*`)
+            message.reply({
+              embeds: [rembed]
+            }).then(msg => {
+              msg.channel.awaitMessages({
+                filter: m => m.author.id === message.author.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+              }).then(collected => {
+                let channel = collected.first().mentions.channels.first();
+                if (channel) {
+                  client.setups.set(message.guild.id, channel.id, `ticketsystem${SetupNumber}.ticketlogid`);
+                  message.reply(`Successfully set the <#${channel.id}> as the TICKET-LOG for ${SetupNumber ? SetupNumber : 1}. Ticketsystem`);
+                } else {
+                  client.setups.set(message.guild.id, "", `ticketsystem${SetupNumber}.ticketlogid`);
+                  message.reply(":x: Disabled the Log, because you did not send a valid channel")
+                }
+              }).catch(error => {
+                return message.reply({
+                  embeds: [new Discord.MessageEmbed()
+                    .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable38"]))
+                    .setColor(es.wrongcolor)
+                    .setDescription(`Cancelled the Operation!`.substring(0, 2000))
+                    .setFooter(client.getFooter(es))
+                  ]
+                });
+              })
+            })
+            break;
+
+          default:
+            message.reply(String("SORRY, that Number does not exists :(\n Your Input:\n> " + collected.first().content).substring(0, 1999))
+            break;
+        }
+      }
+
+
+
+
+    } catch (e) {
+      console.log(String(e.stack).grey.bgRed)
+      return message.reply({
+        embeds: [new MessageEmbed()
+          .setColor(es.wrongcolor).setFooter(client.getFooter(es))
+          .setTitle(client.la[ls].common.erroroccur)
+          .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-ticket"]["variable39"]))
+        ]
+      });
+    }
+  },
+};
+/**
+ * @INFO
+ * Bot Coded by sonujana#0 | https://discord.gg/theolympus69 
+ * @INFO
+ * Please mention Him / Team Olympus, when using this Code
+ * @INFO
+ * Instagram - https://instagram.com/sonujana.ig
+ */
+
+function getNumberEmojis() {
+  return [
+    "<:NNumber0_:1205390294695149660>",
+    "<:one:1167636950925180960>",
+    "<:two:1167637014213054574>",
+    "<:three3:1167637063349321768>",
+    "<:four:1167637099336441997>",
+    "<:five:1167637165203804190>",
+    "<:six:1167637222657376287>",
+    "<:seven:1167637280161284136>",
+    "<:eight:1167637331273056324>",
+    "<:nine:1167637396398030909>",
+    "<:ten:1167637470393942056>",
+    "<:eleven:1167637528090791966>",
+    "<:twelve:1167637592615964772>",
+    "<:thirteen:1167637707778961468>",
+    "<:Fourteen:1167637812514926643>",
+    "<:zy15FIFTEEN:1167638010850967615>",
+    "<:zy16SIXTEEN:1167638184423854120>",
+    "<:seventeen:1167638306490691737>",
+    "<:eighteen:1167638359473135648>",
+    "<:nineteen:1167638507536269403>",
+    "<:twenty:1167638573797883974>",
+    "<:b3_ayi_21TwentyOne:1167638805327646862>",
+    "<:b4_ayi_22TwentyTwo:1167638876194611280>",
+    "<:b5_ayi_23TwentyThree:1167638951302012928>",
+    "<:b6_ayi_24TwentyFour:1167639047666143282>",
+    "<:b7_ayi_25TwentyFive:1167639106642264124>"
+
+  ]
+}
