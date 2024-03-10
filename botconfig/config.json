@@ -1,0 +1,62 @@
+{
+   "prefix": "$",
+   "ownerIDS": [
+      "1070619070468214824"
+   ],
+   
+   "bannermusic": "https://m.soundcloud.com/dualipa/levitating",
+   "fnbr": "c2838e00ed0e79724166cbaa4e1b540b180aa8976f18f381ada54d50b24b64da6e01e7703d6bdabd704366e66659c31fa2025eeaab46c2ccecd64010c8f2baa2",
+   "fortnitetracker": "d54f8936-5737-42ee-a362-143ad2d78169",
+   "memer_api": "BocPQoK08R2",
+   "giphy_API": "y3KcqQTdiS0RYcpNJrWn8hFGglKqX4is",
+   "google_API": "AIzaSyA022fwm_TOQcYTg1N_ohqqIj_RUFUM9BY",
+   "google_Engine_id": "2166875ec165a6c21",
+   "Premium_Activator": "1070619070468214824",
+   "botlogs": {
+      "feedbackChannel": "1198448086079512586",
+      "bugChannel": "1198448189582364705",
+      "suggestionChannel": "1195178427087589392",
+      "commandLogsChannel": "1198454118008754348",
+      "errorLogsChannel": "1198450693292441691"
+   },
+  
+   "status": {
+      "text": "{membercount} Members in {guildcount} Servers",
+      "text2": "$help | Olympus Development",
+      "type": "PLAYING",
+      "url": "https://www.twitch.tv/sonu_jana"
+   },
+   "clientsettings": {
+      "Enable_MongoDB": true,
+      "nodes": [
+         {
+            "host": "lavalink.devamop.in",
+            "port": 80,
+            "password": "DevamOP",
+            "secure": false
+         }
+      ]
+   },
+   "spotify": {
+      "clientSecret": "df7bec95ae88438e8286db597bac8621",
+      "clientID": "ac2b614ca5ce46a18dfd1d3475fd6fd9"
+   },
+   "settings": {
+      "leaveOnEmpty_Channel": {
+         "enabled": true,
+         "time_delay": 30000
+      },
+      "LeaveOnEmpty_Queue": {
+         "enabled": true,
+         "time_delay": 30000
+      },
+      "selfDeaf": false
+   },
+   "lyricssettings": {
+      "lyrics_finder": true,
+      "ksoft_api": {
+         "use_this_instead": true,
+         "api_key": "AIzaSyAAg3GHxipuyDz7KsCAv434yoFT56TR9LQ"
+      }
+   }
+}

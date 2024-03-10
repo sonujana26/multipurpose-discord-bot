@@ -1,0 +1,78 @@
+{
+  "msg": {
+    "COMMENT": "IF YOU DECIDE TO USE CUSTOM EMOJIS, USE THE NAME AND THE ID IN MSG, EXAMPLE: ⬜ --> <:progressbar_left_filled:818558865268408341>",
+
+    "ERROR" : "<a:No:1156196552373702656>",
+    "SUCCESS" : "<a:Yes:1156196509029761034>",
+
+    "disabled" : "<:disabled:1204107662392827904>",
+    "enabled" : "<:enabled:1204107832232775730>",
+
+    "progress_bar": {
+      "leftindicator": "[",
+      "rightindicator": "]",
+
+      "emptyframe": "⬜",
+      "filledframe": "🟧"
+    },
+
+    "playing": "<a:Playing:1213684972326752299>",
+    "pruning": "<:pruning:1204109035549360188>",
+    "equalizer": "<a:EqualizerGreen:1204109273685295166>",
+    "cleared": "<:foxieDeleteRed:1205343536279457833>",
+    "leave_on_empty": "<:leave:1205756524291690577>",
+    "time": "<a:duration:1142776994711478302>",
+    "premium": "<a:premium:1198445473611124867>",
+    "song_by": "<a:song_by:1204110232381296701>",
+    "setup": "<a:setup:1204110385507209328>",
+    "dj": "🎧",
+    "bot": "🤖",
+    "search": "🔎",
+    "resume": "<:resume:1204111036077187152>",
+    "pause": "<:red_pause:1204111312028827678>",
+    "lyrics": "📃",
+    "disk": "<a:disk:1204111698391203862>",
+    "ping": "<a:ping:1204111872157024347>",
+
+    "rewind": "⏪",
+    "forward": "⏩",
+    "pause_resume": "⏯️",
+    "stop": "⏹️",
+    "previous_track": "⏮️",
+    "skip_track": "⏭️",
+    "replay_track": "🔃",
+    "reduce_volume": "🔉",
+    "raise_volume": "🔊",
+    "toggle_mute": "🔇",
+    "repeat_mode": "<:repeat_mode:1204114585104285697>",
+    "autoplay_mode": "♾",
+    "shuffle": "🔀",
+    "show_queue": "📑",
+    "show_current_track": "🩸"
+  },
+  "react": {
+
+    "COMMENT": "IF YOU DECIDE TO USE CUSTOM EMOJIS, USE JUST THE ID IN REACT, EXAMPLE: ⏪ --> 818558865268408341",
+
+    "ERROR" : "1156196552373702656",
+    "SUCCESS" : "1156196509029761034",
+
+
+    "rewind": "⏪",
+    "forward": "⏩",
+    "pause_resume": "⏯️",
+    "stop": "⏹️",
+    "previous_track": "⏮️",
+    "skip_track": "⏭️",
+    "replay_track": "🔃",
+    "reduce_volume": "🔉",
+    "raise_volume": "🔊",
+    "toggle_mute": "🔇",
+    "repeat_mode": "🔄",
+    "autoplay_mode": "♾",
+    "shuffle": "🔀",
+    "show_queue": "📑",
+    "show_current_track": "🩸"
+  }
+
+}
