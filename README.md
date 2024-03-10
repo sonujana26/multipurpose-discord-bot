@@ -1,7 +1,8 @@
 ﻿# Public Bot and Support Server!
 
-<a href="https://discord.gg/F5RWsAWVkp"><img src="https://discord.com/api/guilds/951122149664514099/widget.png?style=banner2"></a>
+<a href="https://discord.gg/F5RWsAWVkp"><img src="https://discord.com/api/guilds/773668217163218944/widget.png?style=banner2"></a>
  
+[**Invite the Public Version of this Bot**](https://discord.com/api/oauth2/authorize?client_id=1097842300526284880&permissions=8&scope=bot) so you don't need to host it by yourself or [Join Olympus](https://discord.gg/F5RWsAWVkp) and Dm `sonujana#0` to get a custom Bot for you!
 
 # Important notes and thank ❤️
 First of all, thanks for using this Source Code, it was and is a ton of work to create and maintain it!
@@ -188,4 +189,5 @@ This is a list of some of the commands that you can use with the Multipurpose Di
 ## Credits
 
 > If consider using this Bot, make sure to credit [Sonu](https://github.com/sonujana26) / Team [Olympus](https://discord.com/invite/F5RWsAWVkp)
+
 > This bot was made by [Tomato6966](https://github.com/Tomato6966/) All credits to him, but heavily modified and added few more commands by me.
